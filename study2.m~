@@ -45,17 +45,28 @@ plot(theta_norm, Yamsc_per);
 title('Yamsc nonlin')
 
 %% Create theoretical PSD:s
+ysquaredC = R0^2/(theta0^2);
+ysquared1 = dirac(theta_norm);
+ysquared2 = 1/(theta0) * tripuls(theta_norm /theta0);
 
-%Ysquared_theor=
+Ysquared_theor= ysquaredC * (ysquared1 +ysquared1)
 
-yhalf2 = triangularPulse(theta_norm/theta0);
+yhalfC = R0/(2 * theta0^2);
+yhalf1 = dirac(theta_norm)/pi;
+yhalf2 = 1/2 * rectpuls(theta_norm /theta0);
+yhalf3 = theta0/(2 * pi) * tripuls(theta_norm/theta0);
+yhalf4 = 1/2 * rectpuls(-theta_norm /theta0);
+yhalf5 = theta0/(2 * pi) * tripuls(-theta_norm/theta0);
 
-Yhalf_theor = R0/(2 * theta0^2) * ( dirac(theta_norm)/pi + ...
-    1/2 .* rectangularPulse(theta_norm /theta0) + theta0/(2 * pi) .* ...
-    triangularPulse(theta_norm/theta0));
+Yhalf_theor = yhalfC * (yhalf1 + yhalf2 + yhalf3 + yhalf4 + yhalf5);
 
-Yamsc_theor = R0/(4 * theta0) * (rectangularPulse((theta_norm+omega0)/theta0)...
-    * rectangularPulse((theta_norm - omega0)/theta0));
+yamscC = R0/(4 * theta0^2);
+yamsc1 = rectpuls((theta_norm+omega0)/theta0);
+yamsc2 = rectpuls((theta_norm-omega0)/theta0);
+yamsc3 = rectpuls((theta_norm-1+omega0)/theta0);
+yamsc4 = rectpuls((theta_norm-1 -omega0)/theta0);
+
+Yamsc_theor = yamscC * (yamsc1 + yamsc2 + yamsc3 + yamsc4);
 
 figure(2);
 %subplot(131);
@@ -67,3 +78,10 @@ title('Yhalf nonlin theor')
 subplot(133);
 plot(theta_norm, Yamsc_theor);
 title('Yamsc nonlin theor')
+%%
+figure(3);
+Rzhwt = 1/(4*pi)*(tripuls(theta_norm/(2*theta0))+tripuls((theta_norm-1)/(2*theta0)))+...
+    +1/4*(rectpuls(theta_norm/(2*theta0))+rectpuls((theta_norm-1)/(2*theta0)));
+Rzhwt(1) = Rzhwt(1)+theta0/pi;
+plot(theta_norm, fftshift(abs(Rzhwt)));
+title('Yamsc nonlin theor david')
