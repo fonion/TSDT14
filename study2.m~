@@ -3,8 +3,9 @@ N = 2^16;
 x = randn(N, 1);
 n = linspace(0, 1, N);
 R0 = 1;
-theta_norm = linspace(-0.5,0.5,N);
+theta_norm = linspace(0,1,N);
 theta0 = .1; %D?ligt namn ... ? Cutoff?
+fca = 0.1/(2);
 
 %% skapar filtrerat brus
 [b a] = butter(10, theta0);
@@ -20,15 +21,15 @@ Yhalf = stepfunction(filter_noise);
 
 %% AM-SC modulator
 
-omega0 = (2*pi*(theta0/2) + 0.0);
+omega0 = (2*pi*fca);
 
 Yamsc = (filter_noise' .* cos(omega0 * n))';
 
 %% Create periodograms
 
-Ysquare_per = fftshift(abs(PeriodFourier(Ysquare)));
-Yhalf_per = fftshift(abs(PeriodFourier(Yhalf)));
-Yamsc_per = fftshift(abs(PeriodFourier(Yamsc)));
+Ysquare_per = abs(PeriodFourier(Ysquare));
+Yhalf_per = abs(PeriodFourier(Yhalf));
+Yamsc_per = abs(PeriodFourier(Yamsc));
 
 %% Plot estimated PSD:s
 
@@ -77,26 +78,26 @@ title('blackPSD2 lin')
 
 %% Create theoretical PSD:s
 ysquaredC = R0^2/(theta0^2);
-ysquared1 = dirac(theta_norm);
+ysquared1 = 0;%dirac(theta_norm);
 ysquared2 = 2/(theta0) * tripuls(theta_norm /theta0);
-ysquared3 = 0;%2/(theta0) * tripuls((theta_norm -1 )/theta0);
+ysquared3 = 2/(theta0) * tripuls((theta_norm -1 )/theta0);
 
 Ysquared_theor= ysquaredC * (ysquared1 + ysquared2 + ysquared3);
 
 yhalfC = R0/(2 * theta0^2);
-yhalf1 = 1;% dirac(theta_norm)/pi;
+yhalf1 = 0;% dirac(theta_norm)/pi;
 yhalf2 = 1/2 * rectpuls(theta_norm /theta0);
-yhalf3 = theta0/(2 * pi) * tripuls(theta_norm/theta0);
-yhalf4 = 1/2 * rectpuls(-theta_norm /theta0);
-yhalf5 = theta0/(2 * pi) * tripuls(-theta_norm/theta0);
+yhalf3 = theta0/(1 * pi) * tripuls(theta_norm/theta0);
+yhalf4 = 1/2 * rectpuls((theta_norm -1)/theta0);
+yhalf5 = theta0/(1 * pi) * tripuls((theta_norm - 1 )/theta0);
 
 Yhalf_theor = yhalfC * (yhalf1 + yhalf2 + yhalf3 + yhalf4 + yhalf5);
 
 yamscC = R0/(4 * theta0^2);
-yamsc1 = rectpuls((theta_norm+omega0)/theta0);
-yamsc2 = rectpuls((theta_norm-omega0)/theta0);
-yamsc3 = 0;%rectpuls((theta_norm-1+omega0)/theta0);
-yamsc4 = 0;%rectpuls((theta_norm-1 -omega0)/theta0);
+yamsc1 = rectpuls((theta_norm + theta0 * omega0)/theta0);
+yamsc2 = rectpuls((theta_norm - theta0 * omega0)/theta0);
+yamsc3 = rectpuls((theta_norm - 1 + theta0 * omega0)/theta0);
+yamsc4 = rectpuls((theta_norm - 1 - theta0 * omega0)/theta0);
 
 Yamsc_theor = yamscC * (yamsc1 + yamsc2 + yamsc3 + yamsc4);
 
@@ -120,15 +121,24 @@ title('Yamsc nonlin theor')
 %title('Yamsc nonlin theor david')
 
 
+%% NYA FRÅGOR
+% 1. VI TROR ATT ALLA THETA0 I DETTA SCRIPT SKA VA SAMMA. STÄMMER DET?
+
+
 
 %% FR?GOR
 % 1. VARF?R BLIR V?R AMSC F?RSKJUTEN? 
 %       SKA VI L?GGA P? EN FASF?RSKJUTNING? 0.2?
-% 3. VI BORDE HA H?G AMPLITUD I NOLL. O?NDLIGT 
+% 2. VI BORDE HA H?G AMPLITUD I NOLL. O?NDLIGT 
 %       ANTAL SAMPELS --> O?NDLIG H?JD I NOLL. 
 %       TY DET ?R D?R DIRAC:EN H?RJAR
-% 4. HISTO: AMSC ?R V?LDIGT LIK BLACKPSD2 (LINJ?R).
+% 3. HISTO: AMSC ?R V?LDIGT LIK BLACKPSD2 (LINJ?R).
         %VAD ?R SKILLNADEN?
-% 5. KAN EN PSD VARA GAUSSISK?
+% 4. KAN EN PSD VARA GAUSSISK?
+% 5. Why do we plot the periodograms? 
+% 6. In order to see if there are any new frequencies.
+%       If so - the system is not LTI.
+% 7. Why do we plot the histograms? 
+%       In order to see that out signal is gaussian. 
+%       If not - the system is not LTI.
 % 6. ASDF
-% 7. ASDF

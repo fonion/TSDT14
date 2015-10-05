@@ -3,8 +3,9 @@ N = 2^16;
 x = randn(N, 1);
 n = linspace(0, 1, N);
 R0 = 1;
-theta_norm = linspace(-0.5,0.5,N);
+theta_norm = linspace(0,1,N);
 theta0 = .1; %D?ligt namn ... ? Cutoff?
+fca = theta0/(2*pi)^2;
 
 %% skapar filtrerat brus
 [b a] = butter(10, theta0);
@@ -20,27 +21,30 @@ Yhalf = stepfunction(filter_noise);
 
 %% AM-SC modulator
 
-omega0 = (2*pi*(theta0/2) + 0.0);
+omega0 = (2 * pi * fca);
 
 Yamsc = (filter_noise' .* cos(omega0 * n))';
 
 %% Create periodograms
 
-Ysquare_per = fftshift(abs(PeriodFourier(Ysquare)));
-Yhalf_per = fftshift(abs(PeriodFourier(Yhalf)));
-Yamsc_per = fftshift(abs(PeriodFourier(Yamsc)));
+Ysquare_per = abs(PeriodFourier(Ysquare));
+Yhalf_per = abs(PeriodFourier(Yhalf));
+Yamsc_per = abs(PeriodFourier(Yamsc));
 
 %% Plot estimated PSD:s
 
 figure(1);
 subplot(131);
 plot(theta_norm,Ysquare_per);
+axis([0 1 0 1]);
 title('Ysquare nonlin')
 subplot(132);
 plot(theta_norm, Yhalf_per);
+axis([0 1 0 1]);
 title('Yhalf nonlin')
 subplot(133);
 plot(theta_norm, Yamsc_per);
+axis([0 1 0 1]);
 title('Yamsc nonlin')
 
 %% Histograms
@@ -77,26 +81,26 @@ title('blackPSD2 lin')
 
 %% Create theoretical PSD:s
 ysquaredC = R0^2/(theta0^2);
-ysquared1 = dirac(theta_norm);
+ysquared1 = 0;%dirac(theta_norm);
 ysquared2 = 2/(theta0) * tripuls(theta_norm /theta0);
-ysquared3 = 0;%2/(theta0) * tripuls((theta_norm -1 )/theta0);
+ysquared3 = 2/(theta0) * tripuls((theta_norm -1 )/theta0);
 
 Ysquared_theor= ysquaredC * (ysquared1 + ysquared2 + ysquared3);
 
 yhalfC = R0/(2 * theta0^2);
-yhalf1 = 1;% dirac(theta_norm)/pi;
+yhalf1 = 0;% dirac(theta_norm)/pi;
 yhalf2 = 1/2 * rectpuls(theta_norm /theta0);
-yhalf3 = theta0/(2 * pi) * tripuls(theta_norm/theta0);
-yhalf4 = 1/2 * rectpuls(-theta_norm /theta0);
-yhalf5 = theta0/(2 * pi) * tripuls(-theta_norm/theta0);
+yhalf3 = theta0/(1 * pi) * tripuls(theta_norm/theta0);
+yhalf4 = 1/2 * rectpuls((theta_norm -1)/theta0);
+yhalf5 = theta0/(1 * pi) * tripuls((theta_norm - 1 )/theta0);
 
 Yhalf_theor = yhalfC * (yhalf1 + yhalf2 + yhalf3 + yhalf4 + yhalf5);
 
 yamscC = R0/(4 * theta0^2);
-yamsc1 = rectpuls((theta_norm+omega0)/theta0);
-yamsc2 = rectpuls((theta_norm-omega0)/theta0);
-yamsc3 = 0;%rectpuls((theta_norm-1+omega0)/theta0);
-yamsc4 = 0;%rectpuls((theta_norm-1 -omega0)/theta0);
+yamsc1 = rectpuls((theta_norm + theta0 * omega0)/theta0);
+yamsc2 = rectpuls((theta_norm - theta0 * omega0)/theta0);
+yamsc3 = rectpuls((theta_norm - 1 + theta0 * omega0)/theta0);
+yamsc4 = rectpuls((theta_norm - 1 - theta0 * omega0)/theta0);
 
 Yamsc_theor = yamscC * (yamsc1 + yamsc2 + yamsc3 + yamsc4);
 
@@ -111,6 +115,12 @@ title('Yhalf nonlin theor')
 subplot(133);
 plot(theta_norm, Yamsc_theor);
 title('Yamsc nonlin theor')
+
+%% asdf
+% NÄR VI RAPPORTERAR: SÄG ATT DIRAC:EN I 0:AN FÅR VÅR BILD ATT SE SKEV UT.
+% PLOTTA T.EX. FRÅN 0->1 I HÖJD. DÅ ÄR DEN JÄTTE LIK IDEALA xDxDxDxDxD
+
+
 %%
 %figure(3);
 %Rzhwt = 1/(4*pi)*(tripuls(theta_norm/(2*theta0))+tripuls((theta_norm-1)/(2*theta0)))+...
@@ -118,6 +128,10 @@ title('Yamsc nonlin theor')
 %Rzhwt(1) = Rzhwt(1)+theta0/pi;
 %plot(theta_norm, fftshift(abs(Rzhwt)));
 %title('Yamsc nonlin theor david')
+
+
+%% NYA FRÅGOR
+% 1. VI TROR ATT ALLA THETA0 I DETTA SCRIPT SKA VA SAMMA. STÄMMER DET?
 
 
 
