@@ -21,7 +21,7 @@ Yhalf = stepfunction(filter_noise);
 
 %% AM-SC modulator
 
-omega0 = (2*pi*(theta0/2) + 0.0);
+omega0 = (2*pi*(theta0/2) + 0.2);
 
 Yamsc = (filter_noise' .* cos(omega0 * n))';
 
