@@ -128,21 +128,6 @@ figure(3)
 plot(theta, PSDh1);
 title('PSD low degree filter')
 
-%% Smoothing av estimated PSD Blackman
-% ACFh1 = ACFh1';
-% windowsize = length(ACFh1');
-% 
-% blackmanw = blackman(windowsize);
-% blackACF = real(blackmanw .* ACFh1);
-
-%%
-% BlackmanW = fft(blackmanw);
-% blackPSD = abs(conv(BlackmanW, PSDh1));
-% thetablack = linspace(0, 1, 1024+windowsize-1);
-% 
-% figure(2)
-% plot(thetablack, blackPSD);
-
 %% Periodogram = PSD för low degree.
 figure(4)
 PSDgram = fftshift(pgram(ACFh1));
@@ -166,29 +151,7 @@ ACFaver1window = window .* ACFaver1;
 PSDaver1window = abs(fft (ACFaver1window));
 plot(thetaaver, PSDaver1window);
 axis([0 1 0 1]);
-%% plot ACFaver1window
-% n5 = linspace (-(N/2), (N/2), 17);
-% 
-% subplot(121)
-% plot(n5, ACFaver1window)
-% title('estimate ACF, all n')
-%subplot(121)
-%stem(n4, ACfaver1window(492:(492+40)))
 
-%% smoothing på ACF
-
-window = blackman(length(ACFh1));
-ACFh1window = window .* ACFh1;
-
-figure(3)
-subplot(121)
-plot(n3, ACFh1window)
-title('smoothing ACF, all n')
-
-
-subplot(122)
-stem(n4, ACFh1window(492:(492+40)))
-title('smoothing ACF, -20 < n < 20')
 %% averaging ACF1
 averinterval = 2;
 avertemp = averageper(outputh1,averinterval);
@@ -203,8 +166,7 @@ title('averaging ACF, all n')
 % stem(n4, ACFaver1)
 % title('averaging ACF, -20 < n < 20')
 
-%% smoothing på aver ACF
-
+%% smoothing på aver ACF1
 
 window = blackman(length(ACFaver1'));
 ACFaver1window = window' .* ACFaver1;
@@ -213,7 +175,7 @@ n6 = linspace(-N/2, N/2, max(size(window)));
 figure(3)
 subplot(121)
 plot(n6, ACFaver1window)
-title('smoothing ACF, all n')
+title('smoothing ACF1, all n')
 
 
 %% 
@@ -242,9 +204,13 @@ subplot(122)
 stem(n4, ACFh2(492:(492+40)))
 title('estimate ACF, -20 < n < 20')
 
+%%
+PSDraw2 = abs(fft(ACFh2));
+plot(theta, PSDraw2)
+
 %% Periodogram = PSD för Ideal. raw estimate
 
-PSDgram2 = pgram(ACFh2);
+PSDgram2 = fftshift(pgram(ACFh2));
 
 figure(1)
 plot(theta, PSDgram2)
@@ -252,28 +218,58 @@ plot(theta, PSDgram2)
 
 %% Smoothing av estimated PSD Blackman
 
-windowsize = 3;
-blackmanw = blackman(windowsize);
-%blackACF = BlackmanW*ACFh1;
-BlackmanW = fft(blackmanw);
-blackPSD2 = abs(conv(BlackmanW, PSDgram2));
-thetablack = linspace(0, 1, 1024+windowsize-1);
+% windowsize = 3;
+% blackmanw = blackman(windowsize);
+% %blackACF = BlackmanW*ACFh1;
+% BlackmanW = fft(blackmanw);
+% blackPSD2 = abs(conv(BlackmanW, PSDgram2));
+% thetablack = linspace(0, 1, 1024+windowsize-1);
+% 
+% figure(2)
+% plot(thetablack, blackPSD2);
 
-figure(2)
-plot(thetablack, blackPSD2);
+%% averaging 
 
-%% averaging på periodogram
+
+intervals = 2;
 thetaaver = linspace(0,1,N/intervals + 1);
-
-intervals = 45;
 PSDaver2 = averageper(outputh2,intervals);
 
 figure(1);
-plot(thetaaver, fftshift(abs(PSDaver2)));
+plot(thetaaver, (abs(PSDaver2)));
 title('PSDaver2')
 
-%%
+%% smoothing på averaging
 
-figure(300)
-plot()
+ACFaver2 = ifft(PSDaver2);
+window = blackman(length(ACFaver2))';
+ACFaver2window = window .* ACFaver2;
+PSDaver2window = abs(fft (ACFaver2window));
+plot(thetaaver, PSDaver2window);
+axis([0 1 0 1]);
+
+%% averaging ACF2
+averinterval = 5;
+avertemp = averageper(outputh2,averinterval);
+ACFaver2 = ifft(avertemp);
+n5 = linspace(-N/2 , N/2 , max(size(ACFaver2)));
+figure(7)
+plot(n5, ACFaver2)
+title('averaging ACF2, all n')
+
+
+% subplot(122)
+% stem(n4, ACFaver1)
+% title('averaging ACF, -20 < n < 20')
+
+%% smoothing på aver ACF2
+
+
+window = blackman(length(ACFaver2'));
+ACFaver2window = window' .* ACFaver2;
+n6 = linspace(-N/2, N/2, max(size(window)));
+
+figure(7)
+plot(n6, ACFaver2window)
+title('smoothing ACF2, all n')
  
