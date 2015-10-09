@@ -37,29 +37,42 @@ subplot(131);
 plot(theta_norm,Ysquare_per);
 axis([0 1 0 1]);
 title('Ysquare nonlin')
+xlabel('Theta')
+ylabel('Power Spectral Density')
 subplot(132);
 plot(theta_norm, Yhalf_per);
 axis([0 1 0 1]);
 title('Yhalf nonlin')
+xlabel('Theta')
+ylabel('Power Spectral Density')
 subplot(133);
 plot(theta_norm, Yamsc_per);
 axis([0 1 0 1]);
 title('Yamsc nonlin')
+xlabel('Theta')
+ylabel('Power Spectral Density')
 
 %% Histograms
 figure(2);
+
 subplot(141)
 histogram(Ysquare,100);
-title('PSDsquare nonlin')
+axis([-2 2 0 25000])
+title('square')
+
 subplot(142)
 histogram(Yhalf,100);
-title('PSDhalf nonlin')
+axis([-2 2 0 35000])
+title('half')
+
+
 subplot(143)
 histogram(Yamsc,100);
-title('PSDamsc nonlin')
+title('amsc')
+
 subplot(144)
 histogram(filter_noise,100);
-title('blackPSD2 lin')
+title('gaussian')
 
 % Varf?r blir den sista PSD:en inte s? gaussisk som vi vill...?
 % Kanske s? att den ?r 52 bred och 95 h?g...?
@@ -108,12 +121,18 @@ figure(2);
 subplot(131);
 plot(theta_norm,Ysquared_theor);
 title('Ysquare nonlin theor')
+xlabel('Theta')
+ylabel('Power Spectral Density')
 subplot(132);
 plot(theta_norm, Yhalf_theor);
 title('Yhalf nonlin theor')
+xlabel('Theta')
+ylabel('Power Spectral Density')
 subplot(133);
 plot(theta_norm, Yamsc_theor);
 title('Yamsc nonlin theor')
+xlabel('Theta')
+ylabel('Power Spectral Density')
 
 %% asdf
 % NÄR VI RAPPORTERAR: SÄG ATT DIRAC:EN I 0:AN FÅR VÅR BILD ATT SE SKEV UT.
