@@ -14,9 +14,9 @@ H1 = 1 ./ (1 - a* exp(-1i * 2 * pi .* theta));
 
 %% PSD low degree
 
-Ry1 = fftshift(R0./(1+a^2-2*a.*cos(2*pi.*theta)));
-%%
-figure(1)
+Ry1 = (R0./(1+a^2-2*a.*cos(2*pi.*theta)));
+
+figure(8)
 plot(theta, Ry1);
 title('PSD low degree filter')
 xlabel('Theta')
@@ -30,7 +30,7 @@ n2 = linspace(-20, 20, 41);
 ry11 = (R0/(1-a^2)).*a.^abs(n1); %intervall alla n
 ry12 = (R0/(1-a^2)).*a.^abs(n2); %intervall -20 till 20
 
-
+figure(2)
 subplot(121)
 plot(n1, ry11)
 title('ACF lowdegree filter för alla n')
@@ -52,16 +52,17 @@ ylabel('Auto Correlation Function')
 theta0 = 0.1;
 H2 = (1/theta0)*rectangularPulse(theta/theta0);
 
-plot(theta, H2)
+%plot(theta, H2)
 
 %% PSD idealt
 
 Ry2 = R0/(theta0^2).*rectangularPulse(theta/theta0);
-
-Ry2 = fftshift(Ry2);
+%spegla en också!!!
+Ry2 = Ry2 + R0/(theta0^2).*rectangularPulse((theta - 1)/theta0);
 
 figure(2)
 plot(theta, Ry2)
+axis([0 1 0 150])
 title('PSD idealt filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
@@ -108,51 +109,87 @@ af = [1;-a];
 outputh1 = filter(bf,af,x);
 
 ACFh1 = ACF_estimation(outputh1, 'bartlett');
-%% Plot ACF Low degree
-figure(2)
+%% Plot ACF Low degree raw
+figure(1)
 subplot(121)
 plot(n3, ACFh1)
 title('estimate ACF, all n')
 
+twenty = (length(ACFh1)/2)-20
 
 subplot(122)
-stem(n4, ACFh1(492:(492+40)))
+stem(n4, ACFh1(twenty:(twenty+40)))
 title('estimate ACF, -20 < n < 20')
 
-%% Estimate PSD low degree
-figure(2)
-PSDh1 = abs(fftshift(fft(ACFh1)));
+%% Estimate PSD low degree raw
+
+PSDh1 = abs((fft(ACFh1)));
 
 figure(3)
 plot(theta, PSDh1);
 title('PSD low degree filter')
 
-%% Smoothing av estimated PSD Blackman
-
-windowsize = 3;
-blackmanw = blackman(windowsize);
-%blackACF = BlackmanW*ACFh1;
-BlackmanW = fft(blackmanw);
-blackPSD = abs(conv(BlackmanW, PSDh1));
-thetablack = linspace(0, 1, 1024+windowsize-1);
-
-figure(2)
-plot(thetablack, blackPSD);
-
-%% Periodogram = PSD för low degree. raw estimate
-
-PSDgram = pgram(ACFh1);
+%% Periodogram = PSD för low degree.
+figure(4)
+PSDgram = fftshift(pgram(ACFh1));
 
 plot(theta, PSDgram)
 
-%% averaging på periodogram
-intervals = 45;
+%% averaging på periodogram PSD aver1
+intervals = 2^6;
 PSDaver1 = averageper(outputh1,intervals);
+
 figure(3);
 thetaaver = linspace(0,1,N/intervals + 1);
-plot(thetaaver, fftshift(abs(PSDaver1)));
+plot(thetaaver, (abs(PSDaver1)));
+axis([0 1 0 1]);
 title('PSDaver1')
+%% smoothing på averaging PSD averwindow!
 
+ACFaver1 = ifft(PSDaver1);
+window = blackman(length(ACFaver1))';
+ACFaver1window = window .* ACFaver1;
+PSDaver1window = abs(fft (ACFaver1window));
+plot(thetaaver, PSDaver1window);
+axis([0 1 0 1]);
+
+%% averaging ACF1
+averinterval = 2;
+avertemp = averageper(outputh1,averinterval);
+ACFaver1 = ifft(avertemp);
+n5 = linspace(-N/2 , N/2 , max(size(ACFaver1)));
+
+twenty1 = (length(ACFaver1)/2)-19;
+figure(6)
+subplot(121)
+plot(n5, ACFaver1)
+title('averaging ACF, all n')
+xlabel('sampels')
+ylabel('Auto Correlation Function')
+
+subplot(122)
+stem(n4, ACFaver1(twenty1:(twenty1+40)))
+title('averaging ACF, -20 < n < 20')
+xlabel('sampels')
+ylabel('Auto Correlation Function')
+
+%% smoothing på aver ACF1
+
+window = blackman(length(ACFaver1'));
+ACFaver1window = window' .* ACFaver1;
+n6 = linspace(-N/2, N/2, max(size(window))); 
+twenty2 = (length(ACFaver1window)/2)-20;
+
+figure(3)
+subplot(121)
+plot(n6, ACFaver1window)
+title('smoothing ACF1, all n')
+
+subplot(122)
+stem(n4, ACFaver1(twenty2:(twenty2+40)))
+title('averaging ACF, -20 < n < 20')
+xlabel('sampels')
+ylabel('Auto Correlation Function')
 
 %% 
 %
@@ -175,29 +212,79 @@ subplot(121)
 plot(n3, ACFh2)
 title('estimate ACF, all n')
 
-
+twenty3 = (length(ACFh2)/2)-20;
 subplot(122)
-stem(n4, ACFh2(492:(492+40)))
+stem(n4, ACFh2(twenty3:(twenty3+40)))
 title('estimate ACF, -20 < n < 20')
+
+%%
+PSDraw2 = abs(fft(ACFh2));
+plot(theta, PSDraw2)
 
 %% Periodogram = PSD för Ideal. raw estimate
 
-PSDgram2 = pgram(ACFh2);
+PSDgram2 = fftshift(pgram(ACFh2));
 
 figure(1)
 plot(theta, PSDgram2)
 
+
 %% Smoothing av estimated PSD Blackman
 
-windowsize = 3;
-blackmanw = blackman(windowsize);
-%blackACF = BlackmanW*ACFh1;
-BlackmanW = fft(blackmanw);
-blackPSD2 = abs(conv(BlackmanW, PSDh2));
-thetablack = linspace(0, 1, 1024+windowsize-1);
+% windowsize = 3;
+% blackmanw = blackman(windowsize);
+% %blackACF = BlackmanW*ACFh1;
+% BlackmanW = fft(blackmanw);
+% blackPSD2 = abs(conv(BlackmanW, PSDgram2));
+% thetablack = linspace(0, 1, 1024+windowsize-1);
+% 
+% figure(2)
+% plot(thetablack, blackPSD2);
 
-figure(2)
-plot(thetablack, blackPSD2);
+%% averaging 
 
 
+intervals = 2;
+thetaaver = linspace(0,1,N/intervals + 1);
+PSDaver2 = averageper(outputh2,intervals);
+
+figure(1);
+plot(thetaaver, (abs(PSDaver2)));
+title('PSDaver2')
+
+%% smoothing på averaging
+
+ACFaver2 = ifft(PSDaver2);
+window = blackman(length(ACFaver2))';
+ACFaver2window = window .* ACFaver2;
+PSDaver2window = abs(fft (ACFaver2window));
+
+plot(thetaaver, PSDaver2window);
+axis([0 1 0 1]);
+
+%% averaging ACF2
+averinterval = 5;
+avertemp = averageper(outputh2,averinterval);
+ACFaver2 = ifft(avertemp);
+n5 = linspace(-N/2 , N/2 , max(size(ACFaver2)));
+figure(7)
+plot(n5, ACFaver2)
+title('averaging ACF2, all n')
+stem(n5, ACFaver2);
+
+
+% subplot(122)
+% stem(n4, ACFaver1)
+% title('averaging ACF, -20 < n < 20')
+
+%% smoothing på aver ACF2
+
+
+window = blackman(length(ACFaver2'));
+ACFaver2window = window' .* ACFaver2;
+n6 = linspace(-N/2, N/2, max(size(window)));
+
+figure(7)
+plot(n6, ACFaver2window)
+title('smoothing ACF2, all n')
  
