@@ -87,8 +87,8 @@ yhalfC = R0/(2 * theta0^2);
 yhalf1 = 1;% dirac(theta_norm)/pi;
 yhalf2 = 1/2 * rectpuls(theta_norm /theta0);
 yhalf3 = theta0/(2 * pi) * tripuls(theta_norm/theta0);
-yhalf4 = 1/2 * rectpuls(-theta_norm /theta0);
-yhalf5 = theta0/(2 * pi) * tripuls(-theta_norm/theta0);
+yhalf4 = 0;%1/2 * rectpuls(-theta_norm /theta0);
+yhalf5 = 0;%theta0/(2 * pi) * tripuls(-theta_norm/theta0);
 
 Yhalf_theor = yhalfC * (yhalf1 + yhalf2 + yhalf3 + yhalf4 + yhalf5);
 
