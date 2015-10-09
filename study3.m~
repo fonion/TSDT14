@@ -1,0 +1,26 @@
+% Study 3
+
+%% skapar filtrerat brus
+N = 2^10;
+x = randn(N, 1);
+
+[b a] = butter(10, theta0);
+filter_noise = filter(b, a, x);
+
+%% +1 -1
+
+n7 = linspace(0, N, N);
+Ypm = filter_noise' .* (-1) .^ n7;
+
+figure(3)
+plot(n3, Ypm)
+
+%% 010101
+
+Y01 = (filter_noise + filter_noise' .* (-1) .^ n7)/2;
+
+figure(4)
+plot(n3, Ypm)
+
+
+

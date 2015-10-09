@@ -1,5 +1,5 @@
 %% study2
-N = 2^16;
+N = 2^10;
 x = randn(N, 1);
 n = linspace(0, 1, N);
 R0 = 1;
