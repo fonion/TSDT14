@@ -1,12 +1,12 @@
 %% generate noise
 
-x = randn(2^10, 1);
+x = randn(2^16, 1);
 
 %% filter low degree
 
 R0 = 1;
 a = 0.9;
-N = 2^10;
+N = 2^16;
 
 theta = linspace(0,1,N);
 
@@ -15,7 +15,7 @@ H1 = 1 ./ (1 - a* exp(-1i * 2 * pi .* theta));
 %% PSD low degree
 
 Ry1 = (R0./(1+a^2-2*a.*cos(2*pi.*theta)));
-
+%%
 figure(8)
 plot(theta, Ry1);
 title('PSD low degree filter')
@@ -47,21 +47,21 @@ ylabel('Auto Correlation Function')
 
 %% Idealt filter
 
- 
+thetaideal = linspace(0, 1, 1024); 
 
 theta0 = 0.1;
-H2 = (1/theta0)*rectangularPulse(theta/theta0);
+H2 = (1/theta0)*rectangularPulse(thetaideal/theta0);
 
 %plot(theta, H2)
 
 %% PSD idealt
 
-Ry2 = R0/(theta0^2).*rectangularPulse(theta/theta0);
-%spegla en också!!!
-Ry2 = Ry2 + R0/(theta0^2).*rectangularPulse((theta - 1)/theta0);
+Ry2 = R0/(theta0^2).*rectangularPulse(thetaideal/theta0);
 
+Ry2 = Ry2 + R0/(theta0^2).*rectangularPulse((thetaideal - 1)/theta0);
+%%
 figure(2)
-plot(theta, Ry2)
+plot(thetaideal, Ry2)
 axis([0 1 0 150])
 title('PSD idealt filter')
 xlabel('Theta')
@@ -111,19 +111,19 @@ outputh1 = filter(bf,af,x);
 ACFh1 = ACF_estimation(outputh1, 'bartlett');
 %% Plot ACF Low degree raw
 
-twenty = (length(ACFh1)/2)-20
+twenty = (length(ACFh1)/2)-20;
 
 figure(1)
 subplot(121)
 plot(n3, ACFh1)
 title('raw estimate ACF, all n')
-xlabel('sampels')
+xlabel('samples')
 ylabel('Auto Correlation Function')
 
 subplot(122)
 stem(n4, ACFh1(twenty:(twenty+40)))
 title('raw estimate ACF, -20 < n < 20')
-xlabel('sampels')
+xlabel('samples')
 ylabel('Auto Correlation Function')
 
 %% Estimate PSD low degree raw
@@ -145,7 +145,7 @@ title('periodogram estimate PSD low degree filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 %% averaging på periodogram PSD aver1
-intervals = 2^6;
+intervals = 2^7;
 PSDaver1 = averageper(outputh1,intervals);
 
 figure(3);
@@ -162,13 +162,14 @@ window = blackman(length(ACFaver1))';
 ACFaver1window = window .* ACFaver1;
 PSDaver1window = abs(fft (ACFaver1window));
 
+figure(4)
 plot(thetaaver, PSDaver1window);
 axis([0 1 0 1]);
 title('PSD averaging and smoothing low degree filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 %% averaging ACF1
-averinterval = 4;
+averinterval = 1;
 avertemp = averageper(outputh1,averinterval);
 ACFaver1 = ifft(avertemp);
 n5 = linspace(-N/2 , N/2 , max(size(ACFaver1)));
@@ -197,14 +198,14 @@ twenty2 = (length(ACFaver1window)/2)-20;
 figure(3)
 subplot(121)
 plot(n6, ACFaver1window)
-title('averaging and smoothing, all n')
-xlabel('sampels')
+title('Smoothing, all n')
+xlabel('samples')
 ylabel('Auto Correlation Function')
 
 subplot(122)
 stem(n4, ACFaver1(twenty2:(twenty2+40)))
-title('averaging and smoothing ACF, -20 < n < 20')
-xlabel('sampels')
+title('Smoothing, -20 < n < 20')
+xlabel('samples')
 ylabel('Auto Correlation Function')
 
 %% 
@@ -227,7 +228,7 @@ figure(2)
 subplot(121)
 plot(n3, ACFh2)
 title('raw estimate ACF, all n')
-xlabel('sampels')
+xlabel('samples')
 ylabel('Auto Correlation Function')
 
 
@@ -271,7 +272,7 @@ ylabel('Power Spectral Density')
 %% averaging 
 
 
-intervals = 2;
+intervals = 32;
 thetaaver = linspace(0,1,N/intervals + 1);
 PSDaver2 = averageper(outputh2,intervals);
 
@@ -287,13 +288,14 @@ window = blackman(length(ACFaver2))';
 ACFaver2window = window .* ACFaver2;
 PSDaver2window = abs(fft (ACFaver2window));
 
+figure(2)
 plot(thetaaver, PSDaver2window);
-axis([0 1 0 1]);
+axis([0 1 0 0.08]);
 title('PSD, averaging and smoothing')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 %% averaging ACF2
-averinterval = 2;
+averinterval = 1;
 avertemp = averageper(outputh2,averinterval);
 ACFaver2 = ifft(avertemp);
 n5 = linspace(-N/2 , N/2 , max(size(ACFaver2)));
@@ -327,13 +329,13 @@ twenty5 = (length(ACFaver2window)/2)-20;
 figure(7)
 subplot(121)
 plot(n6, ACFaver2window)
-title('ACF, averaging and smoothing, all n')
-xlabel('sampels')
+title('smoothing, all n')
+xlabel('samples')
 ylabel('Auto Correlation Function')
 
 subplot(122)
 stem(n4, ACFaver2window(twenty5:(twenty5+40)))
-title('ACF, averaging and smoothing,, -20 < n < 20')
-xlabel('sampels')
+title('ACF, smoothing,, -20 < n < 20')
+xlabel('samples')
 ylabel('Auto Correlation Function')
  

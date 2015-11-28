@@ -12,7 +12,7 @@ for k = -N/2+1:N/2
     case 'Blackman'
         ry_vector(k+N/2) = ry_vector(k+N/2)/(N-abs(k));
     case 'Bartlett'
-        ry_vector(k+N/2) = ry_vector(k+N/2)/(N); 
+        ry_vector(k+N/2) = ry_vector(k+N/2)/(N^2); 
     end
 end     
 end

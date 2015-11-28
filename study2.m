@@ -1,11 +1,11 @@
 %% study2
-N = 2^10;
+N = 2^16;
 x = randn(N, 1);
 n = linspace(0, 1, N);
 R0 = 1;
 theta_norm = linspace(0,1,N);
 theta0 = .1; %D?ligt namn ... ? Cutoff?
-fca = theta0/(2*pi)^2;
+fca = theta0/(2*pi);
 
 %% skapar filtrerat brus
 [b a] = butter(10, theta0);
@@ -36,19 +36,19 @@ figure(1);
 subplot(131);
 plot(theta_norm,Ysquare_per);
 axis([0 1 0 1]);
-title('Ysquare nonlin')
+title('Ysquare')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(132);
 plot(theta_norm, Yhalf_per);
 axis([0 1 0 1]);
-title('Yhalf nonlin')
+title('Yhalf')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(133);
 plot(theta_norm, Yamsc_per);
 axis([0 1 0 1]);
-title('Yamsc nonlin')
+title('Yamsc')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 
@@ -59,20 +59,31 @@ subplot(141)
 histogram(Ysquare,100);
 axis([-2 2 0 25000])
 title('square')
+xlabel('amplitude')
+ylabel('number of samples')
 
 subplot(142)
 histogram(Yhalf,100);
 axis([-2 2 0 35000])
 title('half')
+xlabel('amplitude')
+ylabel('number of samples')
+
 
 
 subplot(143)
 histogram(Yamsc,100);
 title('amsc')
+xlabel('amplitude')
+ylabel('number of samples')
+
 
 subplot(144)
 histogram(filter_noise,100);
 title('gaussian')
+xlabel('amplitude')
+ylabel('number of samples')
+
 
 % Varf?r blir den sista PSD:en inte s? gaussisk som vi vill...?
 % Kanske s? att den ?r 52 bred och 95 h?g...?
