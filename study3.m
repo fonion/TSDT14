@@ -37,8 +37,8 @@ Y01 = (filter_noise - filter_noise .* (-1) .^ (n7 .* phi))/2;
 
 %% estimate PSD (periodogram)
 
-Ypm_per = (abs(PeriodFourier(Ypm)));
-Y01_per = (abs(PeriodFourier(Y01)));
+Ypm_per = (abs(pgram(Ypm)));
+%Y01_per = (abs(PeriodFourier(Y01)));
 
 figure(1);
 subplot(121);
@@ -49,7 +49,7 @@ xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(122);
 plot(theta_norm, Y01_per);
-axis([0 1 0 1]);
+axis([0 1 0 10]);
 title('PSD, Y01')
 xlabel('Theta')
 ylabel('Power Spectral Density')
@@ -65,9 +65,9 @@ xlabel('theta')
 ylabel('Power Spectral Density')
 
 
-Ry011 = (R0/(4*theta0)^2) .* rectpuls(theta_norm/theta0);
-Ry0111 = (R0/(4*theta0)^2) .* rectpuls((theta_norm - 1)/theta0);
-Ry012 = (R0/(4*theta0)^2) .* rectpuls((theta_norm-0.5)/theta0);
+Ry011 = (R0/(4*theta0^2)) .* rectpuls(theta_norm/theta0);
+Ry0111 = (R0/(4*theta0^2)) .* rectpuls((theta_norm - 1)/theta0);
+Ry012 = (R0/(4*theta0^2)) .* rectpuls((theta_norm-0.5)/theta0);
 Ry01 = Ry011 + Ry0111 + Ry012;
 
 figure(2)

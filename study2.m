@@ -9,7 +9,7 @@ fca = theta0/(2*pi);
 
 %% skapar filtrerat brus
 [b a] = butter(10, theta0);
-filter_noise = filter(b, a, x);
+filter_noise = filter(b, a, x); %2600
 
 %% Squarer
 
@@ -26,28 +26,28 @@ Yamsc = (filter_noise' .* cos(omega0 * n))';
 
 %% Create periodograms
 
-Ysquare_per = abs(PeriodFourier(Ysquare));
-Yhalf_per = abs(PeriodFourier(Yhalf));
-Yamsc_per = abs(PeriodFourier(Yamsc));
+Ysquare_per = abs(pgram(Ysquare));
+%Yhalf_per = abs(pgram(Yhalf));
+%Yamsc_per = abs(pgram(Yamsc));
 
 %% Plot estimated PSD:s
 
 figure(1);
 subplot(131);
 plot(theta_norm,Ysquare_per);
-axis([0 1 0 1]);
+%axis([0 1 0 1]);
 title('Ysquare')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(132);
 plot(theta_norm, Yhalf_per);
-axis([0 1 0 1]);
+%axis([0 1 0 1]);
 title('Yhalf')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(133);
 plot(theta_norm, Yamsc_per);
-axis([0 1 0 1]);
+%axis([0 1 0 1]);
 title('Yamsc')
 xlabel('Theta')
 ylabel('Power Spectral Density')
