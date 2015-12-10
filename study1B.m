@@ -33,7 +33,7 @@ ry12 = (R0/(1-a^2)).*a.^abs(n2); %intervall -20 till 20
 figure(2)
 subplot(121)
 plot(n1, ry11)
-title('ACF lowdegree filter för alla n')
+title('ACF lowdegree filter f?r alla n')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
 
@@ -80,7 +80,7 @@ figure(1)
 subplot(121)
 plot(n1, ry21)
 title ('ACF Idealt filter alla n');
-title('ACF lowdegree filter för alla n')
+title('ACF lowdegree filter f?r alla n')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
 
@@ -104,11 +104,11 @@ ylabel('Auto Correlation Function')
 %%
 n3 = linspace((-N/2), (N/2), N);
 n4 = linspace(-20, 20, 41);
-bf = 1;
+bf = 1; 
 af = [1;-a];
 outputh1 = filter(bf,af,x);
 
-ACFh1 = ACF_estimation(outputh1, 'bartlett');
+ACFh1 = ACF_estimation(outputh1, 'Bartlett'); %OBS case-sensitive...
 %% Plot ACF Low degree raw
 
 twenty = (length(ACFh1)/2)-20;
@@ -135,8 +135,17 @@ plot(theta, PSDh1);
 title('raw estimate PSD low degree filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
+65537
+11
+%%
 
-%% Periodogram = PSD för low degree.
+window = blackman(11);
+N = 65537-11
+zeropaddedwindow = [zeros(1,(N)/2) window zeros(1,(N)/2)];
+length(zeropaddedwindow)
+%%
+
+%% Periodogram = PSD f?r low degree.
 figure(4)
 PSDgram = fftshift(pgram(ACFh1));
 
@@ -144,7 +153,7 @@ plot(theta, PSDgram)
 title('periodogram estimate PSD low degree filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-%% averaging på periodogram PSD aver1
+%% averaging p? periodogram PSD aver1
 intervals = 2^7;
 PSDaver1 = averageper(outputh1,intervals);
 
@@ -155,7 +164,7 @@ axis([0 1 0 1]);
 title('PSD averaging low degree filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-%% smoothing på averaging PSD averwindow!
+%% smoothing p? averaging PSD averwindow!
 
 ACFaver1 = ifft(PSDaver1);
 window = blackman(length(ACFaver1))';
@@ -188,10 +197,10 @@ title('averaging ACF, -20 < n < 20')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
 
-%% smoothing på aver ACF1
+%% smoothing p? aver ACF1
 
 window = blackman(length(ACFaver1'));
-ACFaver1window = window' .* ACFaver1;
+ACFaver1window = window' .*  ACFaver1;
 n6 = linspace(-N/2, N/2, max(size(window))); 
 twenty2 = (length(ACFaver1window)/2)-20;
 
@@ -220,7 +229,7 @@ ylabel('Auto Correlation Function')
 [b a] = butter(10, 0.1);
 outputh2 = filter(b, a, x);
 
-ACFh2 = ACF_estimation(outputh2, 'bartlett');
+ACFh2 = ACF_estimation(outputh2, 'Bartlett');
 
 %% Plot Ideal
 
@@ -247,7 +256,7 @@ title('raw PSD, ideal filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 
-%% Periodogram = PSD för Ideal. raw estimate
+%% Periodogram = PSD f?r Ideal. raw estimate
 
 PSDgram2 = fftshift(pgram(ACFh2));
 
@@ -281,7 +290,7 @@ plot(thetaaver, (abs(PSDaver2)));
 title('PSD, averaging ideal filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-%% smoothing på averaging
+%% smoothing p? averaging
 
 ACFaver2 = ifft(PSDaver2);
 window = blackman(length(ACFaver2))';
@@ -319,7 +328,7 @@ ylabel('Auto Correlation Function')
 % stem(n4, ACFaver1)
 % title('averaging ACF, -20 < n < 20')
 
-%% smoothing på aver ACF2
+%% smoothing p? aver ACF2
 window = blackman(length(ACFaver2'));
 ACFaver2window = window' .* ACFaver2;
 n6 = linspace(-N/2, N/2, max(size(window)));
