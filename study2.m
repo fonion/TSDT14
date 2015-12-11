@@ -1,14 +1,15 @@
 %% study2
-N = 2^12;
+N = 2^18;
 x = randn(N, 1);
 n = linspace(0, 1, N);
 R0 = 1;
 theta_norm = linspace(0,1,N);
-theta0 = .3; %D?ligt namn ... ? Cutoff?
-fca = theta0/(2);
+theta0 = .05; %D?ligt namn ... ? Cutoff?
+fca = theta0*8;
+omega0 = (2 * pi * fca);
 
 %% skapar filtrerat brus
-[b a] = butter(10, theta0);
+[b a] = butter(10, 2 * theta0);
 filter_noise = filter(b, a, x); %2600
 
 %% Squarer
@@ -21,33 +22,32 @@ Yhalf = stepfunction(filter_noise);
 
 %% AM-SC modulator
 
-omega0 = (2 * pi * fca);
-Yamsc = (filter_noise' .* cos(omega0 * n))';
+Yamsc = (filter_noise' .* cos(omega0.* theta_norm))';
 
 %% Create periodograms
 
-Ysquare_per = abs(pgram(Ysquare));
-Yhalf_per = abs(pgram(Yhalf));
-Yamsc_per = abs(pgram(Yamsc));
+Ysquare_per = 1/(length(Ysquare))*abs(fft(Ysquare)).^2;%abs(pgram(Ysquare));
+Yhalf_per = 1/(length(Yhalf))*abs(fft(Yhalf)).^2;%abs(pgram(Yhalf));
+Yamsc_per = 1/(length(Yamsc))*abs(fft(Yamsc)).^2;%abs(pgram(Yamsc));
 
 
 %% Plot estimated PSD:s
 
 figure(1);
 subplot(131);
-plot(theta_norm,fftshift(Ysquare_per));
+plot(theta_norm,(Ysquare_per));
 axis([0 1 0 4]);
 title('Ysquare')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(132);
-plot(theta_norm, fftshift(Yhalf_per));
-axis([0 1 0 4]);
+plot(theta_norm, (Yhalf_per));
+axis([0 0.25 0 4]);
 title('Yhalf')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 subplot(133);
-plot(theta_norm, fftshift(Yamsc_per));
+plot(theta_norm, (Yamsc_per));
 axis([0 1 0 4]);
 title('Yamsc')
 xlabel('Theta')
@@ -59,18 +59,19 @@ figure(2);
 
 subplot(141)
 histogram(Ysquare,100);
-axis([-2 2 0 25000])
+axis([-5 5 0 100000])
 title('square')
 xlabel('amplitude')
 ylabel('number of samples')
 
 subplot(142)
 histogram(Yhalf,100);
-axis([-2 2 0 35000])
+axis([-5 5 0 150000])
 title('half')
 xlabel('amplitude')
 ylabel('number of samples')
 
+title('Yhalf nonlin theor')
 
 
 subplot(143)
@@ -89,50 +90,37 @@ ylabel('number of samples')
 
 % Varf?r blir den sista PSD:en inte s? gaussisk som vi vill...?
 % Kanske s? att den ?r 52 bred och 95 h?g...?
-% 
-
-%% Nonlinears
-
-%figure(3)
-%plot(thetablack, blackPSD2)
-%%
-%figure(2);
-%subplot(131)
-%histoPSDsquare
-%subplot(132)
-%histoPSDhalf
-%subplot(133)
-%histoPSDamsc
 
 %% Create theoretical PSD:s
-ysquaredC = R0^2/(theta0^2);
+ysquaredC = R0^2;% R0^
 ysquared1 = 0;%dirac(theta_norm);
-ysquared2 = 2/(theta0) * tripuls(theta_norm /theta0);
-ysquared3 = 2/(theta0) * tripuls((theta_norm -1 )/theta0);
+ysquared2 = 2 * tripuls(theta_norm /(4*theta0));
+ysquared3 = 2 * tripuls((theta_norm-1) /(4*theta0));
 
 Ysquared_theor= ysquaredC * (ysquared1 + ysquared2 + ysquared3);
 
-yhalfC = R0/(2 * theta0^2);
+yhalfC = R0;
 yhalf1 = 0;% dirac(theta_norm)/pi;
-yhalf2 = 1/2 * rectpuls(theta_norm /theta0);
-yhalf3 = theta0/(1 * pi) * tripuls(theta_norm/theta0);
-yhalf4 = 1/2 * rectpuls((theta_norm -1)/theta0);
-yhalf5 = theta0/(1 * pi) * tripuls((theta_norm - 1 )/theta0);
+yhalf2 = 1/4 * rectpuls(theta_norm /(2*theta0));
+yhalf3 = 1/(4 * pi * theta0) * tripuls(theta_norm/(4*theta0));
+yhalf4 = 1/4 * rectpuls((theta_norm -1)/(2*theta0));
+yhalf5 = 1/(4 * pi * theta0) * tripuls((theta_norm -1)/(4*theta0));
 
 Yhalf_theor = yhalfC * (yhalf1 + yhalf2 + yhalf3 + yhalf4 + yhalf5);
 
-yamscC = R0/(4 * theta0^2);
-yamsc1 = rectpuls((theta_norm + theta0 * omega0)/theta0);
-yamsc2 = rectpuls((theta_norm - theta0 * omega0)/theta0);
-yamsc3 = rectpuls((theta_norm - 1 + theta0 * omega0)/theta0);
-yamsc4 = rectpuls((theta_norm - 1 - theta0 * omega0)/theta0);
+yamscC = R0/4;
+yamsc1 = rectpuls((theta_norm + theta0 * omega0)/(2*theta0));
+yamsc2 = rectpuls((theta_norm - theta0 * omega0)/(2*theta0));
+yamsc3 = rectpuls((theta_norm - 1 + theta0 * omega0)/(2*theta0));
+yamsc4 = rectpuls((theta_norm - 1 - theta0 * omega0)/(2*theta0));
 
 Yamsc_theor = yamscC * (yamsc1 + yamsc2 + yamsc3 + yamsc4);
 
 %% Plot periodograms
-figure(2);
+figure(3);
 subplot(131);
 plot(theta_norm,Ysquared_theor);
+axis([0 0.25 0 5]);
 title('Ysquare nonlin theor')
 xlabel('Theta')
 ylabel('Power Spectral Density')
@@ -141,44 +129,10 @@ plot(theta_norm, Yhalf_theor);
 title('Yhalf nonlin theor')
 xlabel('Theta')
 ylabel('Power Spectral Density')
+axis([0 0.25 0 5]);
 subplot(133);
 plot(theta_norm, Yamsc_theor);
 title('Yamsc nonlin theor')
 xlabel('Theta')
 ylabel('Power Spectral Density')
 axis([0 1 0 2]);
-%% asdf
-% N?R VI RAPPORTERAR: S?G ATT DIRAC:EN I 0:AN F?R V?R BILD ATT SE SKEV UT.
-% PLOTTA T.EX. FR?N 0->1 I H?JD. D? ?R DEN J?TTE LIK IDEALA xDxDxDxDxD
-
-
-%%
-%figure(3);
-%Rzhwt = 1/(4*pi)*(tripuls(theta_norm/(2*theta0))+tripuls((theta_norm-1)/(2*theta0)))+...
-%    +1/4*(rectpuls(theta_norm/(2*theta0))+rectpuls((theta_norm-1)/(2*theta0)));
-%Rzhwt(1) = Rzhwt(1)+theta0/pi;
-%plot(theta_norm, fftshift(abs(Rzhwt)));
-%title('Yamsc nonlin theor david')
-
-
-%% NYA FR?GOR
-% 1. VI TROR ATT ALLA THETA0 I DETTA SCRIPT SKA VA SAMMA. ST?MMER DET?
-
-
-
-%% FR?GOR
-% 1. VARF?R BLIR V?R AMSC F?RSKJUTEN? 
-%       SKA VI L?GGA P? EN FASF?RSKJUTNING? 0.2?
-% 2. VI BORDE HA H?G AMPLITUD I NOLL. O?NDLIGT 
-%       ANTAL SAMPELS --> O?NDLIG H?JD I NOLL. 
-%       TY DET ?R D?R DIRAC:EN H?RJAR
-% 3. HISTO: AMSC ?R V?LDIGT LIK BLACKPSD2 (LINJ?R).
-        %VAD ?R SKILLNADEN?
-% 4. KAN EN PSD VARA GAUSSISK?
-% 5. Why do we plot the periodograms? 
-% 6. In order to see if there are any new frequencies.
-%       If so - the system is not LTI.
-% 7. Why do we plot the histograms? 
-%       In order to see that out signal is gaussian. 
-%       If not - the system is not LTI.
-% 6. ASDF
