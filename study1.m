@@ -1,24 +1,16 @@
 %% generate noise
 
- 
-
-x = randn(2^10, 1);
-
- 
+x = randn(2^16, 1);
 
 %% filter low degree
-
- 
 
 R0 = 1;
 a = 0.9;
 N = 2^10;
 
-
 theta = linspace(0,1,N);
 
 H1 = 1./(1-a*exp(-1i*2*pi.*theta)); 
-
 
 %PSD low degree
 
@@ -30,9 +22,6 @@ xlabel('Theta')
 ylabel('Power Spectral Density')
 
 %%
-
- 
-
 %ACF low degree
 
 n1 = linspace((-N/2), (N/2), N+1);
@@ -44,7 +33,7 @@ ry12 = (R0/(1-a^2)).*a.^abs(n2); %intervall -20 till 20
 
 subplot(121)
 plot(n1, ry11)
-title('ACF lowdegree filter för alla n')
+title('ACF lowdegree filter f?r alla n')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
 
@@ -54,18 +43,12 @@ title('ACF lowdegree filter -20 <n< 20')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
 
- 
-
 %% Idealt filter
-
- 
 
 theta0 = 0.1;
 H2 = (1/theta0)*rectangularPulse(theta/theta0);
 
 %plot(theta, H2)
-
- 
 
 %PSD idealt
 
@@ -75,8 +58,8 @@ plot(theta, Ry2)
 title('PSD idealt filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
- %%
 
+%%
 %ACF idealt
 
 n1 = linspace((-N/2), (N/2), N+1);
@@ -85,23 +68,18 @@ n22 = linspace(-20, 20, 100);
 ry21 = R0/(theta0)*sinc(theta0*n1); %intervall alla n
 ry22 = R0/(theta0)*sinc(theta0*n22); %intervall -20 till 20
 
- 
-
 subplot(121)
 plot(n1, ry21)
 title ('ACF Idealt filter alla n');
-title('ACF lowdegree filter för alla n')
+title('ACF lowdegree filter f?r alla n')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
-
 
 subplot(122)
 stem(n22, ry22)
 title ('ACF Idealt filter -20 < n < 20');
 xlabel('sampels')
 ylabel('Auto Correlation Function')
-
- 
 
  
 
@@ -174,28 +152,28 @@ plot(theta3, WpsdH2)
 title ('PSD H2 med blackman');
 
 %% plottar mot varandra. 
-% framräknade ACF och estimerade ACFH1
+% framr?knade ACF och estimerade ACFH1
 
 subplot(121)
 stem(n2, ry12)
-title('uträknade ACF för H1')
+title('utr?knade ACF f?r H1')
 
 
 subplot(122)
 stem(n4, ACFH1) 
-title ('estimerade ACF för H1');
+title ('estimerade ACF f?r H1');
 
-%% framräknade ACF och estimerade ACFH2
+%% framr?knade ACF och estimerade ACFH2
 
 figure(2)
 subplot(121)
 stem(n22, ry22)
-title('uträknade ACF H2')
+title('utr?knade ACF H2')
 
 
 subplot(122)
 stem(n4, acfH2) 
-title ('estimerade ACF för H2');
+title ('estimerade ACF f?r H2');
 
 
 

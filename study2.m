@@ -1,15 +1,15 @@
 %% study2
-N = 2^16;
+N = 2^12;
 x = randn(N, 1);
 n = linspace(0, 1, N);
 R0 = 1;
 theta_norm = linspace(0,1,N);
-theta0 = .1; %D?ligt namn ... ? Cutoff?
-fca = theta0/(2*pi);
+theta0 = .3; %D?ligt namn ... ? Cutoff?
+fca = theta0/(2);
 
 %% skapar filtrerat brus
 [b a] = butter(10, theta0);
-filter_noise = filter(b, a, x);
+filter_noise = filter(b, a, x); %2600
 
 %% Squarer
 
@@ -27,14 +27,18 @@ Yamsc = (filter_noise' .* cos(omega0 * n))';
 %% Create periodograms
 
 Ysquare_per = abs(pgram(Ysquare));
+
 %%
 Yhalf_per = abs(pgram(Yhalf));
 %%
 Yamsc_per = abs(pgram(Yamsc));
 
+
+
 %% Plot estimated PSD:s
 
 figure(1);
+
 %subplot(131);
 plot(theta_norm,fftshift(Ysquare_per));
 axis([0 1 0 3]);
@@ -54,9 +58,12 @@ ylabel('Power Spectral Density')
 figure(3)
 plot(theta_norm, fftshift(Yamsc_per));
 %axis([0 1 0 1]);
+
+
 title('Yamsc')
 xlabel('Theta')
 ylabel('Power Spectral Density')
+
 
 %% Histograms
 figure(2);
@@ -143,6 +150,7 @@ ylabel('Power Spectral Density')
 
 
 
+
 %subplot(132);
 % plot(theta_norm, Yhalf_theor);
 % title('Yhalf nonlin theor')
@@ -155,10 +163,9 @@ ylabel('Power Spectral Density')
 % title('Yamsc nonlin theor')
 % xlabel('Theta')
 % ylabel('Power Spectral Density')
-
 %% asdf
-% NÄR VI RAPPORTERAR: SÄG ATT DIRAC:EN I 0:AN FÅR VÅR BILD ATT SE SKEV UT.
-% PLOTTA T.EX. FRÅN 0->1 I HÖJD. DÅ ÄR DEN JÄTTE LIK IDEALA xDxDxDxDxD
+% N?R VI RAPPORTERAR: S?G ATT DIRAC:EN I 0:AN F?R V?R BILD ATT SE SKEV UT.
+% PLOTTA T.EX. FR?N 0->1 I H?JD. D? ?R DEN J?TTE LIK IDEALA xDxDxDxDxD
 
 
 %%
@@ -170,8 +177,8 @@ ylabel('Power Spectral Density')
 %title('Yamsc nonlin theor david')
 
 
-%% NYA FRÅGOR
-% 1. VI TROR ATT ALLA THETA0 I DETTA SCRIPT SKA VA SAMMA. STÄMMER DET?
+%% NYA FR?GOR
+% 1. VI TROR ATT ALLA THETA0 I DETTA SCRIPT SKA VA SAMMA. ST?MMER DET?
 
 
 
