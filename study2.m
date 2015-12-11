@@ -26,28 +26,34 @@ Yamsc = (filter_noise' .* cos(omega0 * n))';
 
 %% Create periodograms
 
-Ysquare_per = abs(PeriodFourier(Ysquare));
-Yhalf_per = abs(PeriodFourier(Yhalf));
-Yamsc_per = abs(PeriodFourier(Yamsc));
+Ysquare_per = abs(pgram(Ysquare));
+%%
+Yhalf_per = abs(pgram(Yhalf));
+%%
+Yamsc_per = abs(pgram(Yamsc));
 
 %% Plot estimated PSD:s
 
 figure(1);
-subplot(131);
-plot(theta_norm,Ysquare_per);
-axis([0 1 0 1]);
+%subplot(131);
+plot(theta_norm,fftshift(Ysquare_per));
+axis([0 1 0 3]);
 title('Ysquare')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-subplot(132);
-plot(theta_norm, Yhalf_per);
-axis([0 1 0 1]);
+%subplot(132);
+
+figure(2)
+plot(theta_norm, fftshift(Yhalf_per));
+axis([0 1 0 3]);
 title('Yhalf')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-subplot(133);
-plot(theta_norm, Yamsc_per);
-axis([0 1 0 1]);
+%subplot(133);
+
+figure(3)
+plot(theta_norm, fftshift(Yamsc_per));
+%axis([0 1 0 1]);
 title('Yamsc')
 xlabel('Theta')
 ylabel('Power Spectral Density')
@@ -105,45 +111,50 @@ ylabel('number of samples')
 %% Create theoretical PSD:s
 ysquaredC = R0^2/(theta0^2);
 ysquared1 = 0;%dirac(theta_norm);
-ysquared2 = 2/(theta0) * tripuls(theta_norm /theta0);
-ysquared3 = 2/(theta0) * tripuls((theta_norm -1 )/theta0);
+ysquared2 = 2 * tripuls(theta_norm /(2*theta0));
+ysquared3 = 2 * tripuls((theta_norm -1 )/(2*theta0));
 
 Ysquared_theor= ysquaredC * (ysquared1 + ysquared2 + ysquared3);
 
-yhalfC = R0/(2 * theta0^2);
+yhalfC = R0/(2 * theta0);
 yhalf1 = 0;% dirac(theta_norm)/pi;
-yhalf2 = 1/2 * rectpuls(theta_norm /theta0);
-yhalf3 = theta0/(1 * pi) * tripuls(theta_norm/theta0);
-yhalf4 = 1/2 * rectpuls((theta_norm -1)/theta0);
-yhalf5 = theta0/(1 * pi) * tripuls((theta_norm - 1 )/theta0);
+yhalf2 = 1/(2*theta0) * rectpuls(theta_norm /theta0);
+yhalf3 = 1/(2 * pi* theta0) * tripuls(theta_norm/2*theta0);
+yhalf4 = 1/(2*theta0) * rectpuls((theta_norm -1)/theta0);
+yhalf5 = 1/(2 * pi* theta0) * tripuls((theta_norm - 1 )/2*theta0);
 
 Yhalf_theor = yhalfC * (yhalf1 + yhalf2 + yhalf3 + yhalf4 + yhalf5);
 
-yamscC = R0/(4 * theta0^2);
-yamsc1 = rectpuls((theta_norm + theta0 * omega0)/theta0);
-yamsc2 = rectpuls((theta_norm - theta0 * omega0)/theta0);
-yamsc3 = rectpuls((theta_norm - 1 + theta0 * omega0)/theta0);
-yamsc4 = rectpuls((theta_norm - 1 - theta0 * omega0)/theta0);
+yamscC = R0/(4 * theta0);
+yamsc1 = rectpuls((theta_norm + fca)/theta0);
+yamsc2 = rectpuls((theta_norm - fca)/theta0);
+yamsc3 = rectpuls((theta_norm - 1 + fca)/theta0);
+yamsc4 = rectpuls((theta_norm - 1 - fca)/theta0);
 
 Yamsc_theor = yamscC * (yamsc1 + yamsc2 + yamsc3 + yamsc4);
 
 %% Plot periodograms
-figure(2);
-subplot(131);
+ figure(2);
+% subplot(131);
 plot(theta_norm,Ysquared_theor);
 title('Ysquare nonlin theor')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-subplot(132);
-plot(theta_norm, Yhalf_theor);
-title('Yhalf nonlin theor')
-xlabel('Theta')
-ylabel('Power Spectral Density')
-subplot(133);
-plot(theta_norm, Yamsc_theor);
-title('Yamsc nonlin theor')
-xlabel('Theta')
-ylabel('Power Spectral Density')
+
+
+
+%subplot(132);
+% plot(theta_norm, Yhalf_theor);
+% title('Yhalf nonlin theor')
+% xlabel('Theta')
+% ylabel('Power Spectral Density')
+
+
+% subplot(133);
+% plot(theta_norm, Yamsc_theor);
+% title('Yamsc nonlin theor')
+% xlabel('Theta')
+% ylabel('Power Spectral Density')
 
 %% asdf
 % NÄR VI RAPPORTERAR: SÄG ATT DIRAC:EN I 0:AN FÅR VÅR BILD ATT SE SKEV UT.
