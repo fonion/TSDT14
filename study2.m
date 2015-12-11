@@ -31,6 +31,8 @@ Yhalf_per = 1/(length(Yhalf))*abs(fft(Yhalf)).^2;%abs(pgram(Yhalf));
 Yamsc_per = 1/(length(Yamsc))*abs(fft(Yamsc)).^2;%abs(pgram(Yamsc));
 
 
+
+
 %% Plot estimated PSD:s
 
 figure(1);

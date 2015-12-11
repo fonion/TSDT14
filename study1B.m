@@ -1,7 +1,7 @@
 %% generate noise
 
 x = randn(2^16, 1);
-
+figure(100)
 %% filter low degree
 
 R0 = 1;
@@ -50,19 +50,19 @@ ylabel('Auto Correlation Function')
 thetaideal = linspace(0, 1, N); 
 
 theta0 = 0.1;
-H2 = (1/theta0)*rectangularPulse(thetaideal/theta0);
+H2 = rectangularPulse(thetaideal/(2*theta0));
 
 %plot(theta, H2)
 
 %% PSD idealt
 
-Ry2 = R0/(theta0^2).*rectangularPulse(thetaideal/theta0);
+Ry2 = R0*rectangularPulse(thetaideal/(2*theta0));
 
-Ry2 = Ry2 + R0/(theta0^2).*rectangularPulse((thetaideal - 1)/theta0);
+Ry2 = Ry2 + R0*rectangularPulse((thetaideal - 1)/(2*theta0));
 %%
 figure(2)
 plot(thetaideal, Ry2)
-axis([0 1 0 150])
+axis([0 1 0 1.5])
 title('PSD idealt filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
@@ -72,15 +72,14 @@ ylabel('Power Spectral Density')
 n1 = linspace((-N/2), (N/2), N+1);
 n22 = linspace(-20, 20, 41);
 
-ry21 = R0/(theta0)*sinc(theta0*n1); %intervall alla n
-ry22 = R0/(theta0)*sinc(theta0*n22); %intervall -20 till 20
+ry21 = R0*theta0*2*sinc(2*theta0*n1); %intervall alla n
+ry22 = R0*theta0*2*sinc(2*theta0*n22); %intervall -20 till 20
 
  
 figure(1)
 subplot(121)
 plot(n1, ry21)
 title ('ACF Idealt filter alla n');
-title('ACF lowdegree filter f?r alla n')
 xlabel('sampels')
 ylabel('Auto Correlation Function')
 
@@ -107,7 +106,9 @@ n4 = linspace(-20, 20, 41);
 bf = 1; 
 af = [1;-a];
 outputh1 = filter(bf,af,x);
+
 ACFh1 = ACF_estimation(outputh1, 'Bartlett'); %OBS case-sensitive...
+
 %% Plot ACF Low degree raw
 
 twenty = (length(ACFh1)/2)-20;
@@ -152,8 +153,10 @@ plot(theta, PSDgram)
 title('periodogram estimate PSD low degree filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
-%% averaging p? periodogram PSD aver1
-intervals = 2^7;
+
+%% averaging på periodogram PSD aver1
+intervals = 2^8;
+
 PSDaver1 = averageper(outputh1,intervals);
 
 figure(3);
@@ -198,8 +201,14 @@ ylabel('Auto Correlation Function')
 
 %% smoothing p? aver ACF1
 
-window = blackman(length(ACFaver1'));
-ACFaver1window = window' .*  ACFaver1;
+
+%window = blackman(length(ACFaver1'));
+windowlength =  11;
+window = blackman(windowlength )';
+padding = length(ACFaver1)-windowlength ;
+window = [zeros(1,padding/2) window zeros(1,padding/2)];
+ACFaver1window = window .* ACFaver1;
+
 n6 = linspace(-N/2, N/2, max(size(window))); 
 twenty2 = (length(ACFaver1window)/2)-20;
 
@@ -224,8 +233,11 @@ ylabel('Auto Correlation Function')
 %
 
 %%
-[b a] = butter(10, 0.1);
-outputh2 = filter(2600 * b, a, x);
+
+
+[b a] = butter(10, 2*theta0);
+outputh2 = filter(b, a, x);
+
 
 ACFh2 = ACF_estimation(outputh2, 'Bartlett');
 
@@ -279,7 +291,9 @@ ylabel('Power Spectral Density')
 %% averaging 
 
 
-intervals =256;
+
+intervals = 2^6;
+
 thetaaver = linspace(0,1,N/intervals + 1);
 PSDaver2 = averageper(outputh2,intervals);
 
@@ -288,6 +302,37 @@ plot(thetaaver, (abs(PSDaver2)));
 title('PSD, averaging ideal filter')
 xlabel('Theta')
 ylabel('Power Spectral Density')
+
+%% averaging by johan
+
+interval = 2^6;
+[plotmatrix, aver2] = averaging( PSDraw2, interval );
+thetaaver = linspace(0,1,length(aver2));
+
+figure(1);
+plot(plotmatrix, aver2);
+title('PSD, averaging ideal filter')
+xlabel('Theta')
+ylabel('Power Spectral Density')
+
+
+
+%% smoothing på averaging
+windowlength = 513;
+window = blackman(windowlength)/(windowlength/2);
+% padding = length(ACFaver2)-windowlength ;
+% window = [zeros(1,padding/2) window zeros(1,padding/2)];
+% 
+% ACFaver2window = window .* ACFaver2;
+% PSDaver2window = abs(fft (ACFaver2window));
+
+PSDaver2window = filter(window,1,PSDraw2);
+
+%%fixa att plotta mot rätt theta!! :D
+
+figure(2)
+plot(PSDaver2window);
+%axis([0 1 0 3]);
 %% smoothing p? averaging
 
 ACFaver2 = ifft(PSDaver2);
@@ -301,9 +346,11 @@ PSDaver2window = abs(fft (ACFaver2window));
 figure(2)
 plot(thetaaver, PSDaver2window);
 %axis([0 1 0 50]);
+>>>>>>> d6e12f952663d6320b29d45ffa4eb0e8e647036a
 title('PSD, averaging and smoothing')
 xlabel('Theta')
 ylabel('Power Spectral Density')
+ylim([0,6])
 %% averaging ACF2
 averinterval = 1;
 avertemp = averageper(outputh2,averinterval);
@@ -329,13 +376,16 @@ ylabel('Auto Correlation Function')
 % stem(n4, ACFaver1)
 % title('averaging ACF, -20 < n < 20')
 
-%% smoothing p? aver ACF2
-windowlength = 105;
-window = blackman(windowlength)';
-padding = length(ACFh2) - windowlength-1;
-window = [zeros(1,padding/2) window zeros(1,padding/2+1)];
 
-ACFaver2window = window .* ACFh2;
+%% smoothing på aver ACF2
+%window = blackman(length(ACFaver2'));
+
+windowlength =  101;
+window = blackman(windowlength )';
+padding = length(ACFaver2)-windowlength ;
+window = [zeros(1,padding/2) window zeros(1,padding/2)];
+
+ACFaver2window = window .* ACFaver2;
 n6 = linspace(-N/2, N/2, max(size(window)));
 
 twenty5 = (length(ACFaver2window)/2)-20;
